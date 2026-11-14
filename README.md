@@ -45,7 +45,6 @@ The distinction between the model and the application matters. The metrics repor
 
 ## Demo / Screenshots
 
-No live demo is currently deployed. The following screenshots
 show the application interface and example prediction outcomes.
 
 | View                             | Screenshot                                                                     |
