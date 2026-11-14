@@ -49,16 +49,15 @@ No live demo is deployed. Screenshots can be added here once captured.
 
 | View | Screenshot |
 |---|---|
-| Machine parameter input form | _Placeholder: add screenshot_ |
-| Result: no failure risk detected | _Placeholder: add screenshot_ |
-| Result: failure risk detected | _Placeholder: add screenshot_ |
-
+| Machine parameter input form | ![Machine parameter input form](assets/Machine%20parameter%20input%20form.png) |
+| Result: no failure risk detected | ![No failure risk detected](assets/no%20failure%20risk%20detected.png) |
+| Result: failure risk detected | ![Failure risk detected](assets/failure%20risk%20detected.png) |
 ## Key Features
 
 - Binary machine failure risk classification from five numeric measurements and one categorical machine type.
-- Decision threshold of **0.20**, tuned on validation data rather than left at the default 0.50.
+- Decision threshold of **0.20**, selected based on validation F1-score rather than using the default 0.50.
 - FastAPI backend with `GET /health`, `POST /predict`, and interactive Swagger documentation at `/docs`.
-- Strict request validation: out-of-range values, invalid machine types, and unexpected extra fields are rejected with HTTP 422.
+- Strict request validation: non-positive values, invalid machine types, and unexpected extra fields are rejected with HTTP 422.
 - Server-side calculation of the engineered `Power` feature, so clients send only raw measurements.
 - Streamlit interface with grouped inputs, a score gauge, a clear classification result, and a submitted-parameter summary.
 - The frontend communicates with the backend only through HTTP using `requests`. It does not load the model or duplicate feature engineering.
@@ -387,7 +386,7 @@ These tests cover the API layer. Model quality is assessed through the offline e
 - **Task scope:** the system classifies failure risk from a single snapshot of measurements. It does not estimate Remaining Useful Life, track a machine over time, or forecast future failures.
 - **Uncalibrated score:** the failure score is the positive-class score from `predict_proba()`. It has not been calibrated and should not be read as a reliable estimate of real-world failure probability.
 - **Threshold choice:** the 0.20 threshold was selected by validation F1-score among the tested thresholds. It was not based on real maintenance or downtime costs.
-- **Small positive sample:** the test set has only 51 failure cases, so the metrics have wide uncertainty.
+- **Limited test sample:** the test set contains only 51 failure cases, which limits the statistical confidence in the reported precision and recall.
 - **No monitoring or retraining:** there is no data drift monitoring, model versioning pipeline, or retraining workflow.
 - **Demonstration scope:** the project is a portfolio demonstration and has not been hardened or validated for real-world operation.
 
