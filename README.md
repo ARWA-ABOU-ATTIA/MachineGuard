@@ -45,7 +45,7 @@ The distinction between the model and the application matters. The metrics repor
 
 ## Demo / Screenshots
 
-No live demo is deployed. Screenshots can be added here once captured.
+show the application interface and example prediction outcomes.
 
 | View | Screenshot |
 |---|---|
@@ -171,20 +171,29 @@ On this test set, the model identified 40 of 51 failure cases and raised 12 fals
 ```text
 MachineGuard/
 ├── app/
-│   └── main.py                    # FastAPI application
+│   └── main.py
 ├── frontend/
-│   ├── app.py                     # Streamlit interface
-│   ├── Dockerfile                 # Frontend image
-│   └── requirements.txt           # Frontend dependencies
+│   ├── app.py
+│   ├── Dockerfile
+│   └── requirements.txt
 ├── artifacts/
-│   └── machineguard_model.joblib  # Saved ML pipeline
+│   └── machineguard_model.joblib
+├── assets/
+│   ├── Machine parameter input form.png
+│   ├── failure risk detected.png
+│   └── no failure risk detected.png
+├── notebooks/
+│   └── machineguard.ipynb
 ├── tests/
-│   └── test_api.py                # API tests
-├── Dockerfile                     # Backend image
+│   └── test_api.py
 ├── .dockerignore
-├── docker-compose.yml             # Backend and frontend services
-├── requirements.txt               # Backend dependencies
-├── requirements-dev.txt           # Development and test dependencies
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── requirements-dev.txt
+├── test_model_loading.py
+├── LICENSE
 └── README.md
 ```
 
@@ -219,7 +228,11 @@ cd MachineGuard
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+
+# macOS / Linux
+source .venv/bin/activate
 ```
 
 **3. Install dependencies**
