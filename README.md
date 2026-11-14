@@ -1,6 +1,6 @@
 # MachineGuard — Intelligent Machine Failure Risk Assessment System
 
-MachineGuard is an end-to-end machine learning project that estimates whether a machine's current operating conditions indicate a failure risk. A tuned Gradient Boosting classifier, trained on the UCI AI4I 2020 Predictive Maintenance Dataset, is served through a FastAPI backend and explored through a Streamlit interface. The system can be run locally or with Docker Compose.
+MachineGuard is an end-to-end machine learning project that estimates whether a machine's current operating conditions indicate a failure risk. A tuned Gradient Boosting classifier, trained on the [UCI AI4I 2020 Predictive Maintenance Dataset](https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset) , is served through a FastAPI backend and explored through a Streamlit interface. The system can be run locally or with Docker Compose.
 
 > **Scope note:** MachineGuard is a binary failure risk *classification* demonstration. It is not a Remaining Useful Life (RUL) estimator and not a time-series forecasting system. It was trained and evaluated on a synthetic dataset and has not been tested or validated in any real industrial environment.
 
