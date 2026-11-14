@@ -1,8 +1,8 @@
 # MachineGuard — Intelligent Machine Failure Risk Assessment System
 
-MachineGuard is an end-to-end machine learning project that estimates whether a machine's current operating conditions indicate a failure risk. A tuned Gradient Boosting classifier, trained on the UCI AI4I 2020 Predictive Maintenance Dataset, is served through a FastAPI backend and explored through a Streamlit interface. The system can be run locally or with Docker Compose.
+MachineGuard is an end-to-end machine learning project that estimates whether a machine's current operating conditions indicate a failure risk. A tuned Gradient Boosting classifier, trained on the [UCI AI4I 2020 Predictive Maintenance Dataset](https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset), is served through a FastAPI backend and explored through a Streamlit interface. The system can be run locally or with Docker Compose.
 
-> **Scope note:** MachineGuard is a binary failure risk *classification* demonstration. It is not a Remaining Useful Life (RUL) estimator and not a time-series forecasting system. It was trained and evaluated on a synthetic dataset and has not been tested or validated in any real industrial environment.
+> **Scope note:** MachineGuard is a binary failure risk _classification_ demonstration. It is not a Remaining Useful Life (RUL) estimator and not a time-series forecasting system. It was trained and evaluated on a synthetic dataset and has not been tested or validated in any real industrial environment.
 
 ---
 
@@ -45,13 +45,15 @@ The distinction between the model and the application matters. The metrics repor
 
 ## Demo / Screenshots
 
-No live demo is deployed. Screenshots can be added here once captured.
+No live demo is currently deployed. The following screenshots
+show the application interface and example prediction outcomes.
 
-| View | Screenshot |
-|---|---|
-| Machine parameter input form | ![Machine parameter input form](assets/Machine%20parameter%20input%20form.png) |
-| Result: no failure risk detected | ![No failure risk detected](assets/no%20failure%20risk%20detected.png) |
-| Result: failure risk detected | ![Failure risk detected](assets/failure%20risk%20detected.png) |
+| View                             | Screenshot                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------------ |
+| Machine parameter input form     | ![Machine parameter input form](assets/Machine%20parameter%20input%20form.png) |
+| Result: no failure risk detected | ![No failure risk detected](assets/no%20failure%20risk%20detected.png)         |
+| Result: failure risk detected    | ![Failure risk detected](assets/failure%20risk%20detected.png)                 |
+
 ## Key Features
 
 - Binary machine failure risk classification from five numeric measurements and one categorical machine type.
@@ -93,7 +95,7 @@ flowchart LR
 - **Class balance:** 3.39% failure cases and 96.61% normal cases, so the dataset is strongly imbalanced.
 - **Nature:** the dataset is **synthetic**. It was generated to resemble industrial predictive maintenance data and is not drawn from real machines.
 - **Model inputs:** air temperature (K), process temperature (K), rotational speed (RPM), torque (Nm), tool wear (min), machine type (`L`, `M`, `H`), and the engineered `Power` feature.
-- **Excluded columns:** the failure-mode indicator columns `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` were **excluded from the model features**. These columns describe *how* a failure occurred and are derived from the same event as the target, so including them would cause target leakage.
+- **Excluded columns:** the failure-mode indicator columns `TWF`, `HDF`, `PWF`, `OSF`, and `RNF` were **excluded from the model features**. These columns describe _how_ a failure occurred and are derived from the same event as the target, so including them would cause target leakage.
 
 ## Machine Learning Workflow
 
@@ -110,10 +112,10 @@ flowchart LR
 
 Two engineered features were evaluated:
 
-| Feature | Definition | Outcome |
-|---|---|---|
-| `Power` | `Power = Torque × Rotational Speed × (2π / 60)`, in Watts | **Retained** based on the feature-ablation experiments |
-| `Temp_Diff` | Process temperature minus air temperature | **Excluded** from the final feature set |
+| Feature     | Definition                                                | Outcome                                                |
+| ----------- | --------------------------------------------------------- | ------------------------------------------------------ |
+| `Power`     | `Power = Torque × Rotational Speed × (2π / 60)`, in Watts | **Retained** based on the feature-ablation experiments |
+| `Temp_Diff` | Process temperature minus air temperature                 | **Excluded** from the final feature set                |
 
 In the `Power` formula, torque is in Nm and rotational speed is in RPM, so multiplying by 2π / 60 converts RPM to radians per second and gives power in Watts.
 
@@ -125,12 +127,12 @@ The backend is responsible for calculating `Power` before passing data to the sa
 
 **Hyperparameter optimization:**
 
-| Setting | Value |
-|---|---|
-| Search method | `RandomizedSearchCV` |
-| Iterations (parameter configurations sampled) | 40 |
-| Cross-validation | 5-fold `StratifiedKFold` |
-| Optimization metric | `average_precision` (PR-AUC) |
+| Setting                                       | Value                        |
+| --------------------------------------------- | ---------------------------- |
+| Search method                                 | `RandomizedSearchCV`         |
+| Iterations (parameter configurations sampled) | 40                           |
+| Cross-validation                              | 5-fold `StratifiedKFold`     |
+| Optimization metric                           | `average_precision` (PR-AUC) |
 
 **Why PR-AUC?** With only 3.39% positive cases, accuracy alone is misleading: a model that always predicts "no failure" would achieve 96.61% accuracy while detecting no failures.
 
@@ -142,21 +144,21 @@ ROC-AUC measures the model's ability to rank positive cases above negative cases
 
 The final test set (15% of the data, 1,500 records) was evaluated only after model selection and threshold tuning were complete.
 
-| Metric | Score |
-|---|---:|
-| PR-AUC | 0.8559 |
-| ROC-AUC | 0.9788 |
-| Accuracy | 0.9847 |
+| Metric    |  Score |
+| --------- | -----: |
+| PR-AUC    | 0.8559 |
+| ROC-AUC   | 0.9788 |
+| Accuracy  | 0.9847 |
 | Precision | 0.7692 |
-| Recall | 0.7843 |
-| F1-score | 0.7767 |
+| Recall    | 0.7843 |
+| F1-score  | 0.7767 |
 
 **Confusion matrix (threshold = 0.20):**
 
-|  | Predicted: No failure | Predicted: Failure |
-|---|---:|---:|
-| **Actual: No failure** | 1437 (TN) | 12 (FP) |
-| **Actual: Failure** | 11 (FN) | 40 (TP) |
+|                        | Predicted: No failure | Predicted: Failure |
+| ---------------------- | --------------------: | -----------------: |
+| **Actual: No failure** |             1437 (TN) |            12 (FP) |
+| **Actual: Failure**    |               11 (FN) |            40 (TP) |
 
 On this test set, the model identified 40 of 51 failure cases and raised 12 false alarms among 1,449 normal cases.
 
@@ -171,36 +173,46 @@ On this test set, the model identified 40 of 51 failure cases and raised 12 fals
 ```text
 MachineGuard/
 ├── app/
-│   └── main.py                    # FastAPI application
+│   ├── __init__.py
+│   └── main.py
 ├── frontend/
-│   ├── app.py                     # Streamlit interface
-│   ├── Dockerfile                 # Frontend image
-│   └── requirements.txt           # Frontend dependencies
+│   ├── app.py
+│   ├── Dockerfile
+│   └── requirements.txt
 ├── artifacts/
-│   └── machineguard_model.joblib  # Saved ML pipeline
+│   └── machineguard_model.joblib
+├── assets/
+│   ├── Machine parameter input form.png
+│   ├── failure risk detected.png
+│   └── no failure risk detected.png
+├── notebooks/
+│   └── machineguard.ipynb
 ├── tests/
-│   └── test_api.py                # API tests
-├── Dockerfile                     # Backend image
+│   └── test_api.py
 ├── .dockerignore
-├── docker-compose.yml             # Backend and frontend services
-├── requirements.txt               # Backend dependencies
-├── requirements-dev.txt           # Development and test dependencies
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── requirements-dev.txt
+├── test_model_loading.py
+├── LICENSE
 └── README.md
 ```
 
 ## Technologies Used
 
-| Area | Technology |
-|---|---|
-| Language | Python 3.13 (also the base image for both containers) |
-| Machine learning | Scikit-learn 1.6.1 (Gradient Boosting, `RandomizedSearchCV`, `StratifiedKFold`) |
-| Data handling | NumPy 2.1.3, pandas 2.3.3 |
-| Model serialization | joblib 1.6.0 |
-| Backend | FastAPI 0.163.0, Uvicorn 0.54.0 |
-| Frontend | Streamlit |
-| HTTP client (frontend to backend) | Requests |
-| Testing | pytest |
-| Containerization | Docker, Docker Compose |
+| Area                              | Technology                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------- |
+| Language                          | Python 3.13 (also the base image for both containers)                           |
+| Machine learning                  | Scikit-learn 1.6.1 (Gradient Boosting, `RandomizedSearchCV`, `StratifiedKFold`) |
+| Data handling                     | NumPy 2.1.3, pandas 2.3.3                                                       |
+| Model serialization               | joblib 1.6.0                                                                    |
+| Backend                           | FastAPI 0.163.0, Uvicorn 0.54.0                                                 |
+| Frontend                          | Streamlit                                                                       |
+| HTTP client (frontend to backend) | Requests                                                                        |
+| Testing                           | pytest                                                                          |
+| Containerization                  | Docker, Docker Compose                                                          |
 
 Backend dependencies are pinned in `requirements.txt`. The frontend dependencies (`streamlit`, `requests`) in `frontend/requirements.txt` are not pinned to specific versions.
 
@@ -219,7 +231,11 @@ cd MachineGuard
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+
+# macOS / Linux
+source .venv/bin/activate
 ```
 
 **3. Install dependencies**
@@ -243,10 +259,10 @@ streamlit run frontend/app.py
 
 **6. Open the application**
 
-| Service | URL |
-|---|---|
-| Streamlit frontend | http://localhost:8501 |
-| FastAPI backend | http://localhost:8000 |
+| Service               | URL                        |
+| --------------------- | -------------------------- |
+| Streamlit frontend    | http://localhost:8501      |
+| FastAPI backend       | http://localhost:8000      |
 | Swagger documentation | http://localhost:8000/docs |
 
 The frontend reads the backend address from the `API_URL` environment variable and falls back to `http://localhost:8000` when it is not set, which matches the local setup above. To point the frontend at a different backend, set the variable before starting Streamlit.
@@ -255,10 +271,10 @@ The frontend reads the backend address from the `API_URL` environment variable a
 
 The application runs as two services defined in `docker-compose.yml`. Both images are built on `python:3.13-slim`.
 
-| Service | Container name | Build context | Host port |
-|---|---|---|---|
-| `backend` (FastAPI) | `machineguard-api` | `.` (root `Dockerfile`) | `8000` |
-| `frontend` (Streamlit) | `machineguard-frontend` | `./frontend` (`frontend/Dockerfile`) | `8501` |
+| Service                | Container name          | Build context                        | Host port |
+| ---------------------- | ----------------------- | ------------------------------------ | --------- |
+| `backend` (FastAPI)    | `machineguard-api`      | `.` (root `Dockerfile`)              | `8000`    |
+| `frontend` (Streamlit) | `machineguard-frontend` | `./frontend` (`frontend/Dockerfile`) | `8501`    |
 
 Both services use `restart: unless-stopped`. The backend image contains the `app/` directory and the `artifacts/` directory. The frontend image contains only `frontend/app.py`.
 
@@ -311,22 +327,22 @@ docker compose down
 
 ### Endpoints
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/health` | Backend health check. The frontend reads `model` and `version` from the response. |
-| `POST` | `/predict` | Returns a failure risk assessment for one set of machine measurements. |
-| `GET` | `/docs` | Interactive Swagger UI. |
+| Method | Path       | Description                                                                       |
+| ------ | ---------- | --------------------------------------------------------------------------------- |
+| `GET`  | `/health`  | Backend health check. The frontend reads `model` and `version` from the response. |
+| `POST` | `/predict` | Returns a failure risk assessment for one set of machine measurements.            |
+| `GET`  | `/docs`    | Interactive Swagger UI.                                                           |
 
 ### Prediction request
 
-| Field | Type | Validation rule |
-|---|---|---|
-| `air_temperature` | number | Must be greater than 0 (kelvin) |
-| `process_temperature` | number | Must be greater than 0 (kelvin) |
-| `rotational_speed` | number | Must be greater than 0 (RPM) |
-| `torque` | number | Must be greater than 0 (Nm) |
-| `tool_wear` | number | Must be greater than or equal to 0 (minutes) |
-| `machine_type` | string | Must be one of `L`, `M`, or `H` |
+| Field                 | Type   | Validation rule                              |
+| --------------------- | ------ | -------------------------------------------- |
+| `air_temperature`     | number | Must be greater than 0 (kelvin)              |
+| `process_temperature` | number | Must be greater than 0 (kelvin)              |
+| `rotational_speed`    | number | Must be greater than 0 (RPM)                 |
+| `torque`              | number | Must be greater than 0 (Nm)                  |
+| `tool_wear`           | number | Must be greater than or equal to 0 (minutes) |
+| `machine_type`        | string | Must be one of `L`, `M`, or `H`              |
 
 Extra request fields are forbidden. The `Power` feature is **not** sent by the client; the backend computes it.
 
@@ -347,12 +363,12 @@ curl -X POST http://localhost:8000/predict \
 
 ### Prediction response
 
-| Field | Description |
-|---|---|
+| Field           | Description                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------- |
 | `failure_score` | Positive-class score from the model's `predict_proba()` method (0 to 1). Not calibrated. |
-| `threshold` | The decision threshold used (0.20). |
-| `prediction` | `1` for failure risk, `0` for no failure risk. |
-| `status` | A human-readable classification label. |
+| `threshold`     | The decision threshold used (0.20).                                                      |
+| `prediction`    | `1` for failure risk, `0` for no failure risk.                                           |
+| `status`        | A human-readable classification label.                                                   |
 
 Example response:
 
